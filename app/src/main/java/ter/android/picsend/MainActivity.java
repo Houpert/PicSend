@@ -34,6 +34,7 @@ public class MainActivity extends ActionBarActivity {
 
     static final String psd = "n92vh922";
     private Mail m;
+    private boolean photoTake;
 
     /*Const*/
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -61,13 +62,16 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.setting_layout);
+        if(emptyData()) {
+            photoTake = false;
+            setContentView(R.layout.photo_layout);
+            initIdPhoto();
+        }else {
+            setContentView(R.layout.setting_layout);
+            initIdSetting();
+            readData();
+        }
 
-        initIdSetting();
-        readData();
-
-        img = (ImageView) findViewById(R.id.imageView);
-        m = new Mail("yoann.houpert@master-developpement-logiciel.fr", psd);
 
         /*GeoLocation*/
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -116,6 +120,9 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    private void initIdPhoto(){
+        img = (ImageView) findViewById(R.id.imageView);
+    }
 
     /*Toast Message*/
     private void toastMessage(String msg) {
@@ -131,14 +138,16 @@ public class MainActivity extends ActionBarActivity {
             picData.setPseudo(pseudo_et.getText().toString());
             picData.setEmail(email_et.getText().toString());
             setContentView(R.layout.photo_layout);
+            initIdPhoto();
 
             saveData("pseudo",pseudo_et.getText().toString());
             saveData("email",email_et.getText().toString());
         }
     }
 
+    /*Persistence Data*/
     public void saveData(String key, String value){
-        SharedPreferences settings = getSharedPreferences("Test", Context.MODE_PRIVATE);
+        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
 
         SharedPreferences.Editor edit = settings.edit();
         edit.putString(key, value);
@@ -146,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void readData(){
-        SharedPreferences settings = getSharedPreferences("Test", Context.MODE_PRIVATE);
+        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
         if (settings.contains("pseudo")){
             String pseudo = settings.getString("pseudo","");
             pseudo_et.setText(pseudo);
@@ -158,6 +167,13 @@ public class MainActivity extends ActionBarActivity {
             picData.setEmail(email);
         }
 
+    }
+
+    public boolean emptyData(){
+        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
+        if(settings.contains("pseudo") && settings.contains("email"))
+            return true;
+        return false;
     }
 
     /*AfterPhoto Block*/
@@ -208,48 +224,35 @@ public class MainActivity extends ActionBarActivity {
                 return true;
             case R.id.menu_settings:
                 setContentView(R.layout.setting_layout);
-                saveData("pseudo",pseudo_et.getText().toString());
-                saveData("email",email_et.getText().toString());
+                initIdSetting();
+                readData();
                 return true;
-            case R.id.menu_afterphoto:
-                setContentView(R.layout.afterphoto_layout);
-                initIdAfterPhoto();
+            case R.id.menu_photo:
+                setContentView(R.layout.photo_layout);
+                initIdPhoto();
+                photoTake = false;
                 return true;
             default:
                 return false;
         }
     }
 
-
-    public void takePhoto(View view) {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
-    }
-
-    public void sendEmailv1(){
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        emailIntent.setData(Uri.parse("mailto:"));
-        emailIntent.setType("message/rfc822");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL  , new String[]{"yoann.houpert@yahoo.fr"});
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "PicSend Project");
-        emailIntent.putExtra(Intent.EXTRA_TEXT   , picData.toString());
-
-
-        try {
-            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-            finish();
-            Log.i("Finished sending email...", "");
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(MainActivity.this,
-                    "There is no email client installed.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public void sendEmail(){
         MailFeedTask mft = new MailFeedTask(getApplicationContext(),picData);
         mft.execute();
+    }
+
+    public void takePhoto(View view) {
+        if(photoTake == false) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }else{
+            setContentView(R.layout.afterphoto_layout);
+            initIdAfterPhoto();
+        }
+
     }
 
     @Override
@@ -261,9 +264,9 @@ public class MainActivity extends ActionBarActivity {
             img.setImageBitmap(imageBitmap);
 
             picData.setPicture(imageBitmap);
-
             Log.v(TAG, picData.toString());
 
+            photoTake = true;
         }
     }
 }

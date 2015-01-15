@@ -32,7 +32,6 @@ import mailSender.MailFeedTask;
 
 public class MainActivity extends ActionBarActivity {
 
-    static final String psd = "n92vh922";
     private Mail m;
     private boolean photoTake;
 

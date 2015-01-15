@@ -27,8 +27,13 @@ import dataclass.EtatType;
 import dataclass.GeoLocal;
 import dataclass.PictureData;
 import dataclass.Type;
+import mailSender.Mail;
+import mailSender.MailFeedTask;
 
 public class MainActivity extends ActionBarActivity {
+
+    static final String psd = "n92vh922";
+    private Mail m;
 
     /*Const*/
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -62,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
         readData();
 
         img = (ImageView) findViewById(R.id.imageView);
+        m = new Mail("yoann.houpert@master-developpement-logiciel.fr", psd);
 
         /*GeoLocation*/
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -222,7 +228,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void sendEmail(){
+    public void sendEmailv1(){
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("message/rfc822");
@@ -239,6 +245,11 @@ public class MainActivity extends ActionBarActivity {
             Toast.makeText(MainActivity.this,
                     "There is no email client installed.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void sendEmail(){
+        MailFeedTask mft = new MailFeedTask(getApplicationContext(),picData);
+        mft.execute();
     }
 
     @Override

@@ -2,10 +2,12 @@ package ter.android.picsend;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -25,8 +27,13 @@ import dataclass.EtatType;
 import dataclass.GeoLocal;
 import dataclass.PictureData;
 import dataclass.Type;
+import mailSender.Mail;
+import mailSender.MailFeedTask;
 
 public class MainActivity extends ActionBarActivity {
+
+    static final String psd = "n92vh922";
+    private Mail m;
 
     /*Const*/
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -54,8 +61,13 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.photo_layout);
+        setContentView(R.layout.setting_layout);
+
+        initIdSetting();
+        readData();
+
         img = (ImageView) findViewById(R.id.imageView);
+        m = new Mail("yoann.houpert@master-developpement-logiciel.fr", psd);
 
         /*GeoLocation*/
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -78,8 +90,8 @@ public class MainActivity extends ActionBarActivity {
     private void initIdSetting() {
         pseudo_et = (EditText) findViewById(R.id.setting_et_pseudo);
         email_et = (EditText) findViewById(R.id.setting_et_email);
-
     }
+
     private void initIdAfterPhoto() {
         rg_type = (RadioGroup) findViewById(R.id.type);
         rg_etat = (RadioGroup) findViewById(R.id.etat);
@@ -120,7 +132,32 @@ public class MainActivity extends ActionBarActivity {
             picData.setEmail(email_et.getText().toString());
             setContentView(R.layout.photo_layout);
 
+            saveData("pseudo",pseudo_et.getText().toString());
+            saveData("email",email_et.getText().toString());
         }
+    }
+
+    public void saveData(String key, String value){
+        SharedPreferences settings = getSharedPreferences("Test", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor edit = settings.edit();
+        edit.putString(key, value);
+        edit.apply();
+    }
+
+    public void readData(){
+        SharedPreferences settings = getSharedPreferences("Test", Context.MODE_PRIVATE);
+        if (settings.contains("pseudo")){
+            String pseudo = settings.getString("pseudo","");
+            pseudo_et.setText(pseudo);
+            picData.setPseudo(pseudo);
+        }
+        if (settings.contains("email")){
+            String email = settings.getString("email","");
+            email_et.setText(email);
+            picData.setEmail(email);
+        }
+
     }
 
     /*AfterPhoto Block*/
@@ -151,6 +188,8 @@ public class MainActivity extends ActionBarActivity {
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
         picData.setGeo(geoLocal);
+        sendEmail();
+        Log.v(TAG, picData.toString());
 
     }
 
@@ -169,7 +208,8 @@ public class MainActivity extends ActionBarActivity {
                 return true;
             case R.id.menu_settings:
                 setContentView(R.layout.setting_layout);
-                initIdSetting();
+                saveData("pseudo",pseudo_et.getText().toString());
+                saveData("email",email_et.getText().toString());
                 return true;
             case R.id.menu_afterphoto:
                 setContentView(R.layout.afterphoto_layout);
@@ -186,6 +226,30 @@ public class MainActivity extends ActionBarActivity {
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
+    }
+
+    public void sendEmailv1(){
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("message/rfc822");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL  , new String[]{"yoann.houpert@yahoo.fr"});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "PicSend Project");
+        emailIntent.putExtra(Intent.EXTRA_TEXT   , picData.toString());
+
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            finish();
+            Log.i("Finished sending email...", "");
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(MainActivity.this,
+                    "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void sendEmail(){
+        MailFeedTask mft = new MailFeedTask(getApplicationContext(),picData);
+        mft.execute();
     }
 
     @Override

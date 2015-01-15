@@ -2,6 +2,7 @@ package ter.android.picsend;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
@@ -55,7 +56,11 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.photo_layout);
+        setContentView(R.layout.setting_layout);
+
+        initIdSetting();
+        readData();
+
         img = (ImageView) findViewById(R.id.imageView);
 
         /*GeoLocation*/
@@ -79,8 +84,8 @@ public class MainActivity extends ActionBarActivity {
     private void initIdSetting() {
         pseudo_et = (EditText) findViewById(R.id.setting_et_pseudo);
         email_et = (EditText) findViewById(R.id.setting_et_email);
-
     }
+
     private void initIdAfterPhoto() {
         rg_type = (RadioGroup) findViewById(R.id.type);
         rg_etat = (RadioGroup) findViewById(R.id.etat);
@@ -121,7 +126,32 @@ public class MainActivity extends ActionBarActivity {
             picData.setEmail(email_et.getText().toString());
             setContentView(R.layout.photo_layout);
 
+            saveData("pseudo",pseudo_et.getText().toString());
+            saveData("email",email_et.getText().toString());
         }
+    }
+
+    public void saveData(String key, String value){
+        SharedPreferences settings = getSharedPreferences("Test", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor edit = settings.edit();
+        edit.putString(key, value);
+        edit.apply();
+    }
+
+    public void readData(){
+        SharedPreferences settings = getSharedPreferences("Test", Context.MODE_PRIVATE);
+        if (settings.contains("pseudo")){
+            String pseudo = settings.getString("pseudo","");
+            pseudo_et.setText(pseudo);
+            picData.setPseudo(pseudo);
+        }
+        if (settings.contains("email")){
+            String email = settings.getString("email","");
+            email_et.setText(email);
+            picData.setEmail(email);
+        }
+
     }
 
     /*AfterPhoto Block*/
@@ -172,7 +202,8 @@ public class MainActivity extends ActionBarActivity {
                 return true;
             case R.id.menu_settings:
                 setContentView(R.layout.setting_layout);
-                initIdSetting();
+                saveData("pseudo",pseudo_et.getText().toString());
+                saveData("email",email_et.getText().toString());
                 return true;
             case R.id.menu_afterphoto:
                 setContentView(R.layout.afterphoto_layout);

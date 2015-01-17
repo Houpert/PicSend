@@ -1,9 +1,11 @@
 package dataclass;
 
+import java.io.Serializable;
+
 /**
  * Created by yhoupert on 08/01/15.
  */
-public class GeoLocal {
+public class GeoLocal implements Serializable {
 
     private double longitude;
     private double latitude;

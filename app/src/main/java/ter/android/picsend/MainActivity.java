@@ -54,15 +54,6 @@ public class MainActivity extends ActionBarActivity {
     private LocationManager locationManager;
     private ImageView img;
 
-    /*Setting View variable*/
-    private EditText pseudo_et;
-    private EditText email_et;
-
-    /*AfterPhoto variable*/
-    private RadioGroup rg_type;
-    private RadioGroup rg_etat;
-    private RadioButton rb_etat_1;
-    private RadioButton rb_etat_2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +63,8 @@ public class MainActivity extends ActionBarActivity {
             setContentView(R.layout.photo_layout);
             initIdPhoto();
         }else {
-            setContentView(R.layout.setting_layout);
-            initIdSetting();
-            readData();
+            Intent settingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(settingsActivity);
         }
 
 
@@ -95,36 +85,6 @@ public class MainActivity extends ActionBarActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,2000,0,locationListener);
     }
 
-    /*Init Block By Layout*/
-    private void initIdSetting() {
-        pseudo_et = (EditText) findViewById(R.id.setting_et_pseudo);
-        email_et = (EditText) findViewById(R.id.setting_et_email);
-    }
-
-    private void initIdAfterPhoto() {
-        rg_type = (RadioGroup) findViewById(R.id.type);
-        rg_etat = (RadioGroup) findViewById(R.id.etat);
-        rb_etat_1 = (RadioButton) findViewById(R.id.rb_etat_1);
-        rb_etat_2 = (RadioButton) findViewById(R.id.rb_etat_2);
-
-        rg_type.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // find which radio button is selected
-                if(checkedId == R.id.rb_animal) {
-                    rb_etat_1.setText(R.string.invertebre);
-                    rb_etat_2.setText(R.string.vertebre);
-                }else {
-                    rb_etat_1.setText(R.string.more50);
-                    rb_etat_2.setText(R.string.less50);
-                }
-            }
-
-        });
-
-    }
-
     private void initIdPhoto(){
         img = (ImageView) findViewById(R.id.imageView);
     }
@@ -135,84 +95,6 @@ public class MainActivity extends ActionBarActivity {
         toast.show();
     }
 
-    /*Setting Block*/
-    public void valideSetting(View view) {
-        if(pseudo_et.getText().toString().matches("")|| email_et.getText().toString().matches(""))
-            toastMessage("Un champ a été oubliée");
-        else {
-            picData.setPseudo(pseudo_et.getText().toString());
-            picData.setEmail(email_et.getText().toString());
-            setContentView(R.layout.photo_layout);
-            initIdPhoto();
-
-            saveData("pseudo",pseudo_et.getText().toString());
-            saveData("email",email_et.getText().toString());
-        }
-    }
-
-    /*Persistence Data*/
-    public void saveData(String key, String value){
-        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor edit = settings.edit();
-        edit.putString(key, value);
-        edit.apply();
-    }
-
-    public void readData(){
-        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
-        if (settings.contains("pseudo")){
-            String pseudo = settings.getString("pseudo","");
-            pseudo_et.setText(pseudo);
-            picData.setPseudo(pseudo);
-        }
-        if (settings.contains("email")){
-            String email = settings.getString("email","");
-            email_et.setText(email);
-            picData.setEmail(email);
-        }
-
-    }
-
-    public boolean notEmptyData(){
-        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
-        if(settings.contains("pseudo") && settings.contains("email"))
-            return true;
-        return false;
-    }
-
-    /*AfterPhoto Block*/
-    public void valideData(View view) {
-        int selected_Type = rg_type.getCheckedRadioButtonId();
-        int selected_etat = rg_etat.getCheckedRadioButtonId();
-
-        if(R.id.rb_animal == selected_Type) {
-            picData.setType(Type.Animal);
-            if(R.id.rb_etat_1 == selected_etat)
-                picData.setEtat(EtatType.Invertebre);
-            else
-                picData.setEtat(EtatType.Vertebre);
-        }else {
-            picData.setType(Type.Plante);
-            if(R.id.rb_etat_1 == selected_etat)
-                picData.setEtat(EtatType.More50);
-            else
-                picData.setEtat(EtatType.Less50);
-        }
-
-        picData.setDate(new Date());
-
-        if(!notEmptyData()) {
-            setContentView(R.layout.setting_layout);
-            initIdSetting();
-        }
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-        picData.setGeo(geoLocal);
-        sendEmail();
-        Log.v(TAG, picData.toString());
-
-    }
 
     /*Menu Block*/
     @Override
@@ -228,9 +110,8 @@ public class MainActivity extends ActionBarActivity {
                 System.exit(RESULT_OK);
                 return true;
             case R.id.menu_settings:
-                setContentView(R.layout.setting_layout);
-                initIdSetting();
-                readData();
+                Intent settingsActivity = new Intent(this, SettingsActivity.class);
+                startActivity(settingsActivity);
                 return true;
             case R.id.menu_photo:
                 setContentView(R.layout.photo_layout);
@@ -242,27 +123,45 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void sendEmail(){
-        MailFeedTask mft = new MailFeedTask(this,picData);
-        mft.execute();
 
-        toastMessage("Email en cours d'envoie");
 
-        setContentView(R.layout.photo_layout);
-        initIdPhoto();
+    public String readData(String key){
+        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
+        if (settings.contains(key))
+            return settings.getString(key,"");
+        return null;
+
     }
 
+    public boolean notEmptyData(){
+        SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
+        if(settings.contains("pseudo") && settings.contains("email"))
+            return true;
+        return false;
+    }
+
+
     public void takePhoto(View view) {
+        if(!notEmptyData()){
+            toastMessage("Veuillez fournir les informations");
+            Intent settingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(settingsActivity);
+        }else{
+            picData.setPseudo(readData("pseudo"));
+            picData.setEmail(readData("email"));
+
+        }
+
         if(photoTake == false) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }else{
-            setContentView(R.layout.tag_layout);
-            initIdAfterPhoto();
-
             photoTake = false;
+            Intent tagActivity = new Intent(this, TagActivity.class);
+            tagActivity.putExtra("picData",picData);
+            startActivity(tagActivity);
         }
 
     }
@@ -285,7 +184,6 @@ public class MainActivity extends ActionBarActivity {
                     cursor.close();
 
                     Bitmap myBitmap = BitmapFactory.decodeFile(fileSrc);
-                    picData.setPicture(myBitmap);
                     img = (ImageView) findViewById(R.id.imageView);
 
 
@@ -311,13 +209,23 @@ public class MainActivity extends ActionBarActivity {
                             int imageX = touchX - viewCoords[0]; // viewCoords[0] is the X coordinate
                             int imageY = touchY - viewCoords[1]; // viewCoords[1] is the y coordinate
 
-                            Log.v(TAG,imageX+"--"+imageY);
-
                             InterestPoint ip = new InterestPoint(imageX,imageY);
                             picData.setInteres(ip);
                             return false;
                         }
                     });
+
+
+
+
+                    if(!notEmptyData()) {
+                        Intent settingsActivity = new Intent(this, SettingsActivity.class);
+                        startActivity(settingsActivity);
+                    }
+
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+                    picData.setGeo(geoLocal);
+                    picData.setDate(new Date());
 
                     photoTake = true;
                 }catch (Exception e){

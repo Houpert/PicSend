@@ -9,15 +9,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Created by yhoupert on 08/01/15.
  */
-public class PictureData {
+public class PictureData implements Serializable {
 
-    private Bitmap picture;
     private String pseudo;
     private String email;
     private String filePath;
@@ -38,7 +38,6 @@ public class PictureData {
     @Override
     public String toString() {
         return "PictureData{" +
-                "picture=" + picture +
                 ", pseudo='" + pseudo + '\'' +
                 ", email='" + email + '\'' +
                 ", filePath='" + filePath + '\'' +
@@ -51,14 +50,6 @@ public class PictureData {
     }
 
     /*Getter & Setter*/
-    public Bitmap getPicture() {
-        return picture;
-    }
-
-    public void setPicture(Bitmap picture) {
-        this.picture = picture;
-    }
-
     public String getPseudo() {
         return pseudo;
     }

@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -53,6 +54,7 @@ public class MainActivity extends ActionBarActivity {
     private LocationListener locationListener;
     private LocationManager locationManager;
     private ImageView img;
+    private Button button;
 
 
     @Override
@@ -87,11 +89,12 @@ public class MainActivity extends ActionBarActivity {
 
     private void initIdPhoto(){
         img = (ImageView) findViewById(R.id.imageView);
+        button = (Button) findViewById(R.id.button_photo);
     }
 
     /*Toast Message*/
-    private void toastMessage(String msg) {
-        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+    private void toastMessage(String msg, int time) {
+        Toast toast = Toast.makeText(getApplicationContext(), msg, time);
         toast.show();
     }
 
@@ -143,7 +146,6 @@ public class MainActivity extends ActionBarActivity {
 
     public void takePhoto(View view) {
         if(!notEmptyData()){
-            toastMessage("Veuillez fournir les informations");
             Intent settingsActivity = new Intent(this, SettingsActivity.class);
             startActivity(settingsActivity);
         }else{
@@ -156,11 +158,13 @@ public class MainActivity extends ActionBarActivity {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                button.setText(R.string.next);
             }
+
         }else{
             photoTake = false;
             Intent tagActivity = new Intent(this, TagActivity.class);
-            tagActivity.putExtra("picData",picData);
+            tagActivity.putExtra("picData", picData);
             startActivity(tagActivity);
         }
 
@@ -170,9 +174,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Toast.makeText(this, imageUri.toString(), Toast.LENGTH_LONG).show();
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            /*Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            img.setImageBitmap(imageBitmap);*/
 
             String fileSrc = null;
             Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED, MediaStore.Images.ImageColumns.ORIENTATION}, MediaStore.Images.Media.DATE_ADDED, null, "date_added ASC");
@@ -194,6 +195,7 @@ public class MainActivity extends ActionBarActivity {
                     myBitmap.createScaledBitmap(myBitmap, size.x/25, size.y/25, true);
                     img.setImageBitmap(myBitmap);
 
+                    toastMessage("Put an interest point on the picture",  Toast.LENGTH_LONG);
 
                     this.img.setOnTouchListener(new View.OnTouchListener() {
 
@@ -211,6 +213,7 @@ public class MainActivity extends ActionBarActivity {
 
                             InterestPoint ip = new InterestPoint(imageX,imageY);
                             picData.setInteres(ip);
+                            toastMessage("Interest point done",  Toast.LENGTH_SHORT);
                             return false;
                         }
                     });
@@ -229,11 +232,11 @@ public class MainActivity extends ActionBarActivity {
 
                     photoTake = true;
                 }catch (Exception e){
-                    toastMessage("Not enought memory");
+                    toastMessage("Not enought memory",  Toast.LENGTH_SHORT);
                 }
             }
         }else{
-            toastMessage("Error during take the photo");
+            toastMessage("Error during take the photo",  Toast.LENGTH_SHORT);
         }
     }
 }

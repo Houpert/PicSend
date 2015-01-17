@@ -41,9 +41,6 @@ public class TagActivity extends Activity {
         Log.v("DEBUG",picData.toString());
 
         initIdAfterPhoto();
-
-
-
     }
 
 

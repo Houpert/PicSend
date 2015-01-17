@@ -38,7 +38,7 @@ public class PictureData implements Serializable {
     @Override
     public String toString() {
         return "PictureData{" +
-                ", pseudo='" + pseudo + '\'' +
+                "  pseudo='" + pseudo + '\'' +
                 ", email='" + email + '\'' +
                 ", filePath='" + filePath + '\'' +
                 ", date=" + date +

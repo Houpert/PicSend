@@ -3,6 +3,7 @@ package ter.android.picsend;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
@@ -248,8 +249,11 @@ public class MainActivity extends ActionBarActivity {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }else{
-            setContentView(R.layout.afterphoto_layout);
+            setContentView(R.layout.tag_layout);
             initIdAfterPhoto();
+
+            picData.storeImage(picData.getPicture(), getApplicationContext());
+            photoTake = false;
         }
 
     }
@@ -261,6 +265,17 @@ public class MainActivity extends ActionBarActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             img.setImageBitmap(imageBitmap);
+
+
+            Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED, MediaStore.Images.ImageColumns.ORIENTATION}, MediaStore.Images.Media.DATE_ADDED, null, "date_added ASC");
+            if(cursor != null && cursor.moveToLast()){
+                Uri fileURI = Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
+                String fileSrc = fileURI.toString();
+                picData.setFilePath(fileSrc);
+                cursor.close();
+            }
+
+
 
             picData.setPicture(imageBitmap);
             Log.v(TAG, picData.toString());

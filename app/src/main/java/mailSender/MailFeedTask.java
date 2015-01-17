@@ -18,7 +18,7 @@ import dataclass.PictureData;
 /**
  * Created by yhoupert on 15/01/15.
  */
-public class MailFeedTask extends AsyncTask<Void, Void, String> {
+public class MailFeedTask extends AsyncTask<Void, Void, Boolean> {
     static final String psw = "picSend_50";
     static final String mailServe = "picSendServer@gmail.com";
     private Mail m = new Mail(mailServe, psw);
@@ -43,30 +43,33 @@ public class MailFeedTask extends AsyncTask<Void, Void, String> {
     }
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected Boolean doInBackground(Void... params) {
         System.out.println(params);
-        sendEmail();
-        return "end";
+        return sendEmail();
     }
 
-    public void sendEmail(){
+    public boolean sendEmail(){
         String[] toArr = {data.getEmail()}; // This is an array, you can add more emails, just separate them with a coma
         m.setTo(toArr); // load array to setTo function
-        m.setFrom("yoann.houpert@master-developpement-logiciel.fr"); // who is sending the email
+        m.setFrom(mailServe); // who is sending the email
         m.setSubject("PicSend "+data.getDate());
         m.setBody(data.toString());
 
         try {
+            m.addAttachment(data.getFilePath());
             //m.addAttachment("/sdcard/myPicture.jpg"); // path to file you want to attach
             if(m.send()) {
                 toastMessage("Email was sent successfully.");
                 System.out.println("Take");
+                return true;
             } else {
                 toastMessage("Email was not sent.");
                 System.out.println("Error");
+                return false;
             }
         } catch(Exception e) {
             toastMessage("There was a problem sending the email.");
+            return false;
         }
 
     }

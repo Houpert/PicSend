@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,6 +30,7 @@ import java.util.Date;
 
 import dataclass.EtatType;
 import dataclass.GeoLocal;
+import dataclass.InterestPoint;
 import dataclass.PictureData;
 import dataclass.Type;
 import mailSender.Mail;
@@ -260,7 +262,6 @@ public class MainActivity extends ActionBarActivity {
             setContentView(R.layout.tag_layout);
             initIdAfterPhoto();
 
-            picData.storeImage(picData.getPicture(), getApplicationContext());
             photoTake = false;
         }
 
@@ -277,28 +278,51 @@ public class MainActivity extends ActionBarActivity {
             String fileSrc = null;
             Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED, MediaStore.Images.ImageColumns.ORIENTATION}, MediaStore.Images.Media.DATE_ADDED, null, "date_added ASC");
             if(cursor != null && cursor.moveToLast()){
-               try {
-                   Uri fileURI = Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
-                   fileSrc = fileURI.toString();
-                   picData.setFilePath(fileSrc);
-                   cursor.close();
+                try {
+                    Uri fileURI = Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
+                    fileSrc = fileURI.toString();
+                    picData.setFilePath(fileSrc);
+                    cursor.close();
 
-                   Bitmap myBitmap = BitmapFactory.decodeFile(fileSrc);
-                   picData.setPicture(myBitmap);
-                   ImageView myImage = (ImageView) findViewById(R.id.imageView);
+                    Bitmap myBitmap = BitmapFactory.decodeFile(fileSrc);
+                    picData.setPicture(myBitmap);
+                    img = (ImageView) findViewById(R.id.imageView);
 
 
-                   Display display = getWindowManager().getDefaultDisplay();
-                   Point size = new Point();
-                   display.getSize(size);
+                    Display display = getWindowManager().getDefaultDisplay();
+                    Point size = new Point();
+                    display.getSize(size);
 
-                   myBitmap.createScaledBitmap(myBitmap, size.x/25, size.y/25, true);
-                   myImage.setImageBitmap(myBitmap);
+                    myBitmap.createScaledBitmap(myBitmap, size.x/25, size.y/25, true);
+                    img.setImageBitmap(myBitmap);
 
-                   photoTake = true;
-               }catch (Exception e){
-                   toastMessage("Not enought memory");
-               }
+
+                    this.img.setOnTouchListener(new View.OnTouchListener() {
+
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+
+                            int[] viewCoords = new int[2];
+                            img.getLocationOnScreen(viewCoords);
+
+                            int touchX = (int) event.getX();
+                            int touchY = (int) event.getY();
+
+                            int imageX = touchX - viewCoords[0]; // viewCoords[0] is the X coordinate
+                            int imageY = touchY - viewCoords[1]; // viewCoords[1] is the y coordinate
+
+                            Log.v(TAG,imageX+"--"+imageY);
+
+                            InterestPoint ip = new InterestPoint(imageX,imageY);
+                            picData.setInteres(ip);
+                            return false;
+                        }
+                    });
+
+                    photoTake = true;
+                }catch (Exception e){
+                    toastMessage("Not enought memory");
+                }
             }
         }else{
             toastMessage("Error during take the photo");

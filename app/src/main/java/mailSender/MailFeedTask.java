@@ -32,14 +32,6 @@ public class MailFeedTask extends AsyncTask<Void, Void, Boolean> {
         data = picData;
     }
 
-    private void toastMessage(String msg) {
-        try {
-            Toast toast = Toast.makeText(context.getApplicationContext(), msg, Toast.LENGTH_SHORT);
-            toast.show();
-        }catch(Exception e){
-        }
-    }
-
     protected void onPostExecute() {
         // TODO: check this.exception
         // TODO: do something with the feed
@@ -62,16 +54,13 @@ public class MailFeedTask extends AsyncTask<Void, Void, Boolean> {
             m.addAttachment(data.getFilePath());
             //m.addAttachment("/sdcard/myPicture.jpg"); // path to file you want to attach
             if(m.send()) {
-                toastMessage("Email was sent successfully.");
                 System.out.println("Take");
                 return true;
             } else {
-                toastMessage("Email was not sent.");
                 System.out.println("Error");
                 return false;
             }
         } catch(Exception e) {
-            toastMessage("There was a problem sending the email.");
             return false;
         }
 

@@ -23,6 +23,7 @@ public class PictureData {
     private String filePath;
     private Date date;
     private GeoLocal geo;
+    private InterestPoint interes;
     private Type type;
     private EtatType etat;
 
@@ -40,56 +41,13 @@ public class PictureData {
                 "picture=" + picture +
                 ", pseudo='" + pseudo + '\'' +
                 ", email='" + email + '\'' +
+                ", filePath='" + filePath + '\'' +
                 ", date=" + date +
                 ", geo=" + geo +
+                ", interes=" + interes +
                 ", type=" + type +
                 ", etat=" + etat +
                 '}';
-    }
-
-    public void storeImage(Bitmap image, Context context) {
-        File pictureFile = getOutputMediaFile(context);
-        if (pictureFile == null) {
-            return;
-        }
-        try {
-            FileOutputStream fos = new FileOutputStream(pictureFile);
-            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
-            fos.close();
-
-            Log.v("debug", "hasSave");
-
-        } catch (FileNotFoundException e) {
-            Log.v("debug", "NotFound");
-        } catch (IOException e) {
-            Log.v("debug", "NotFound");
-        }
-    }
-
-    /** Create a File for saving an image or video */
-    private  File getOutputMediaFile(Context context){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.    + getApplicationContext().getPackageName()
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
-                + "/Android/data/"
-                + context.getPackageName()
-                + "/Files");
-
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                return null;
-            }
-        }
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
-        File mediaFile;
-        String mImageName="MI_"+ timeStamp +".jpg";
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
-        return mediaFile;
     }
 
     /*Getter & Setter*/
@@ -155,5 +113,13 @@ public class PictureData {
 
     public void setEtat(EtatType etat) {
         this.etat = etat;
+    }
+
+    public InterestPoint getInteres() {
+        return interes;
+    }
+
+    public void setInteres(InterestPoint interes) {
+        this.interes = interes;
     }
 }

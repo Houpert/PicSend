@@ -82,8 +82,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/etat"
             android:layout_centerHorizontal="true"
-            android:text="@string/valider"
-            android:id="@+id/setting_bt_valider"
+            android:text="@string/sendMail"
+            android:id="@+id/sendMail"
             android:onClick="valideData"
             />
 

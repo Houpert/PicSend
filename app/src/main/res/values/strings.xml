@@ -5,6 +5,8 @@
     <string name="app_name">PicSend</string>
     <string name="hello_world">Hello world!</string>
     <string name="valider">Valider</string>
+    <string name="sendMail">Send Data</string>
+
 
     <!--Menu String-->
     <string name="menu_settings">Settings</string>

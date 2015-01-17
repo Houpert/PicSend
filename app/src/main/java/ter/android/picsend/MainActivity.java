@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -267,25 +270,38 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Toast.makeText(this, imageUri.toString(), Toast.LENGTH_LONG).show();
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
+            /*Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            img.setImageBitmap(imageBitmap);
+            img.setImageBitmap(imageBitmap);*/
 
-
+            String fileSrc = null;
             Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED, MediaStore.Images.ImageColumns.ORIENTATION}, MediaStore.Images.Media.DATE_ADDED, null, "date_added ASC");
             if(cursor != null && cursor.moveToLast()){
-                Uri fileURI = Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
-                String fileSrc = fileURI.toString();
-                picData.setFilePath(fileSrc);
-                cursor.close();
+               try {
+                   Uri fileURI = Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
+                   fileSrc = fileURI.toString();
+                   picData.setFilePath(fileSrc);
+                   cursor.close();
+
+                   Bitmap myBitmap = BitmapFactory.decodeFile(fileSrc);
+                   picData.setPicture(myBitmap);
+                   ImageView myImage = (ImageView) findViewById(R.id.imageView);
+
+
+                   Display display = getWindowManager().getDefaultDisplay();
+                   Point size = new Point();
+                   display.getSize(size);
+
+                   myBitmap.createScaledBitmap(myBitmap, size.x/25, size.y/25, true);
+                   myImage.setImageBitmap(myBitmap);
+
+                   photoTake = true;
+               }catch (Exception e){
+                   toastMessage("Not enought memory");
+               }
             }
-
-
-
-            picData.setPicture(imageBitmap);
-            Log.v(TAG, picData.toString());
-
-            photoTake = true;
+        }else{
+            toastMessage("Error during take the photo");
         }
     }
 }

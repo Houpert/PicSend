@@ -33,8 +33,11 @@ public class MailFeedTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     private void toastMessage(String msg) {
-//        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
- //       toast.show();
+        try {
+            Toast toast = Toast.makeText(context.getApplicationContext(), msg, Toast.LENGTH_SHORT);
+            toast.show();
+        }catch(Exception e){
+        }
     }
 
     protected void onPostExecute() {

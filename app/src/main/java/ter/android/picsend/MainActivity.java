@@ -62,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(emptyData()) {
+        if(notEmptyData()) {
             photoTake = false;
             setContentView(R.layout.photo_layout);
             initIdPhoto();
@@ -169,7 +169,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    public boolean emptyData(){
+    public boolean notEmptyData(){
         SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
         if(settings.contains("pseudo") && settings.contains("email"))
             return true;
@@ -197,7 +197,7 @@ public class MainActivity extends ActionBarActivity {
 
         picData.setDate(new Date());
 
-        if(picData.getPseudo() == null || picData.getEmail() == null) {
+        if(!notEmptyData()) {
             setContentView(R.layout.setting_layout);
             initIdSetting();
         }
@@ -238,8 +238,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void sendEmail(){
-        MailFeedTask mft = new MailFeedTask(getApplicationContext(),picData);
+        MailFeedTask mft = new MailFeedTask(this,picData);
         mft.execute();
+
+        toastMessage("Email en cours d'envoie");
+
+        setContentView(R.layout.photo_layout);
+        initIdPhoto();
     }
 
     public void takePhoto(View view) {

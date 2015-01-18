@@ -44,15 +44,14 @@ public class MailFeedTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     public boolean sendEmail(){
-        String[] toArr = {data.getEmail()}; // This is an array, you can add more emails, just separate them with a coma
-        m.setTo(toArr); // load array to setTo function
-        m.setFrom(mailServe); // who is sending the email
-        m.setSubject("PicSend "+data.getDate());
+        String[] toArr = {data.getEmail()};
+        m.setTo(toArr);
+        m.setFrom(mailServe);
+        m.setSubject("PicSend " + data.getDate());
         m.setBody(data.toString());
 
         try {
             m.addAttachment(data.getFilePath());
-            //m.addAttachment("/sdcard/myPicture.jpg"); // path to file you want to attach
             if(m.send()) {
                 System.out.println("Take");
                 return true;

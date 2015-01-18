@@ -1,16 +1,6 @@
 package dataclass;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.Environment;
-import android.util.Log;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -22,8 +12,8 @@ public class PictureData implements Serializable {
     private String email;
     private String filePath;
     private Date date;
-    private GeoLocal geo;
-    private InterestPoint interes;
+    private GeoLocation geoLocation;
+    private PointOfInterest pointOfInterest;
     private Type type;
     private EtatType etat;
 
@@ -38,12 +28,12 @@ public class PictureData implements Serializable {
     @Override
     public String toString() {
         return "PictureData{" +
-                "  pseudo='" + pseudo + '\'' +
+                " pseudo='" + pseudo + '\'' +
                 ", email='" + email + '\'' +
                 ", filePath='" + filePath + '\'' +
                 ", date=" + date +
-                ", geo=" + geo +
-                ", interes=" + interes +
+                ", geoLocation=" + geoLocation +
+                ", pointOfInterest=" + pointOfInterest +
                 ", type=" + type +
                 ", etat=" + etat +
                 '}';
@@ -74,12 +64,12 @@ public class PictureData implements Serializable {
         this.date = date;
     }
 
-    public GeoLocal getGeo() {
-        return geo;
+    public GeoLocation getGeoLocation() {
+        return geoLocation;
     }
 
-    public void setGeo(GeoLocal geo) {
-        this.geo = geo;
+    public void setGeoLocation(GeoLocation geoLocation) {
+        this.geoLocation = geoLocation;
     }
 
     public Type getType() {
@@ -106,11 +96,11 @@ public class PictureData implements Serializable {
         this.etat = etat;
     }
 
-    public InterestPoint getInteres() {
-        return interes;
+    public PointOfInterest getPointOfInterest() {
+        return pointOfInterest;
     }
 
-    public void setInteres(InterestPoint interes) {
-        this.interes = interes;
+    public void setPointOfInterest(PointOfInterest pointOfInterest) {
+        this.pointOfInterest = pointOfInterest;
     }
 }

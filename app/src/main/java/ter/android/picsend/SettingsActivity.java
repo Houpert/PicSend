@@ -103,7 +103,7 @@ public class SettingsActivity extends Activity {
 
     public void validSetting(View view) {
         if(pseudo_et.getText().toString().matches("")|| email_et.getText().toString().matches(""))
-            toastMessage("Un champ a été oubliée");
+            toastMessage("All fields are mandatory");
         else {
             saveData("pseudo",pseudo_et.getText().toString());
             saveData("email",email_et.getText().toString());

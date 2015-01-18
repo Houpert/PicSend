@@ -5,12 +5,12 @@ import java.io.Serializable;
 /**
  * Created by yhoupert on 08/01/15.
  */
-public class GeoLocal implements Serializable {
+public class GeoLocation implements Serializable {
 
     private double longitude;
     private double latitude;
 
-    public GeoLocal() {
+    public GeoLocation() {
     }
 
     public double getLongitude() {
@@ -36,7 +36,7 @@ public class GeoLocal implements Serializable {
 
     @Override
     public String toString() {
-        return "GeoLocal{" +
+        return "GeoLocation{" +
                 "longitude=" + longitude +
                 ", latitude=" + latitude +
                 '}';

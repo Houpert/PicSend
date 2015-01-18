@@ -14,43 +14,36 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.util.Date;
 
-import dataclass.EtatType;
-import dataclass.GeoLocal;
-import dataclass.InterestPoint;
+import dataclass.GeoLocation;
+import dataclass.PointOfInterest;
 import dataclass.PictureData;
-import dataclass.Type;
 import mailSender.Mail;
-import mailSender.MailFeedTask;
 
 public class MainActivity extends ActionBarActivity {
 
     private Mail m;
-    private boolean photoTake;
+    private boolean photoTaken = false;
 
     /*Const*/
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     /*Debug Variable*/
-    private static final String TAG = "MyActivity";
+    private static final String TAG = "MainActivity";
 
     /*Other Variable*/
     private PictureData picData = new PictureData();
-    private GeoLocal geoLocal = new GeoLocal();
+    private GeoLocation geoLocation = new GeoLocation();
     private LocationListener locationListener;
     private LocationManager locationManager;
     private ImageView img;
@@ -60,22 +53,27 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(notEmptyData()) {
-            photoTake = false;
-            setContentView(R.layout.photo_layout);
-            initIdPhoto();
-        }else {
+
+        if (!settingsFilled()) {
             Intent settingsActivity = new Intent(this, SettingsActivity.class);
             startActivity(settingsActivity);
+        } else {
+            if (photoTaken) {
+                Intent tagActivity = new Intent(this, TagActivity.class);
+                startActivity(tagActivity);
+            } else {
+                setContentView(R.layout.photo_layout);
+                initPhoto();
+                takePhoto(null);
+            }
         }
-
 
         /*GeoLocation*/
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                geoLocal.setLatAndLong(location.getLatitude(), location.getLongitude());
+                geoLocation.setLatAndLong(location.getLatitude(), location.getLongitude());
             }
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -87,7 +85,7 @@ public class MainActivity extends ActionBarActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,2000,0,locationListener);
     }
 
-    private void initIdPhoto(){
+    private void initPhoto(){
         img = (ImageView) findViewById(R.id.imageView);
         button = (Button) findViewById(R.id.button_photo);
     }
@@ -98,14 +96,12 @@ public class MainActivity extends ActionBarActivity {
         toast.show();
     }
 
-
-    /*Menu Block*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -117,16 +113,13 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(settingsActivity);
                 return true;
             case R.id.menu_photo:
-                setContentView(R.layout.photo_layout);
-                initIdPhoto();
-                photoTake = false;
+                Intent mainActivity = new Intent(this, MainActivity.class);
+                startActivity(mainActivity);
                 return true;
             default:
                 return false;
         }
     }
-
-
 
     public String readData(String key){
         SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
@@ -136,7 +129,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    public boolean notEmptyData(){
+    public boolean settingsFilled(){
         SharedPreferences settings = getSharedPreferences("Data", Context.MODE_PRIVATE);
         if(settings.contains("pseudo") && settings.contains("email"))
             return true;
@@ -145,7 +138,7 @@ public class MainActivity extends ActionBarActivity {
 
 
     public void takePhoto(View view) {
-        if(!notEmptyData()){
+        if(!settingsFilled()){
             Intent settingsActivity = new Intent(this, SettingsActivity.class);
             startActivity(settingsActivity);
         }else{
@@ -154,7 +147,7 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-        if(photoTake == false) {
+        if(photoTaken == false) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
@@ -162,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
             }
 
         }else{
-            photoTake = false;
+            photoTaken = false;
             Intent tagActivity = new Intent(this, TagActivity.class);
             tagActivity.putExtra("picData", picData);
             startActivity(tagActivity);
@@ -195,7 +188,7 @@ public class MainActivity extends ActionBarActivity {
                     myBitmap.createScaledBitmap(myBitmap, size.x/25, size.y/25, true);
                     img.setImageBitmap(myBitmap);
 
-                    toastMessage("Put an interest point on the picture",  Toast.LENGTH_LONG);
+                    toastMessage("Add a point of interest on the picture",  Toast.LENGTH_LONG);
 
                     this.img.setOnTouchListener(new View.OnTouchListener() {
 
@@ -211,9 +204,9 @@ public class MainActivity extends ActionBarActivity {
                             int imageX = touchX - viewCoords[0]; // viewCoords[0] is the X coordinate
                             int imageY = touchY - viewCoords[1]; // viewCoords[1] is the y coordinate
 
-                            InterestPoint ip = new InterestPoint(imageX,imageY);
-                            picData.setInteres(ip);
-                            toastMessage("Interest point done",  Toast.LENGTH_SHORT);
+                            PointOfInterest ip = new PointOfInterest(imageX,imageY);
+                            picData.setPointOfInterest(ip);
+                            toastMessage("Point of interest added",  Toast.LENGTH_SHORT);
                             return false;
                         }
                     });
@@ -221,22 +214,22 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-                    if(!notEmptyData()) {
+                    if(!settingsFilled()) {
                         Intent settingsActivity = new Intent(this, SettingsActivity.class);
                         startActivity(settingsActivity);
                     }
 
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-                    picData.setGeo(geoLocal);
+                    picData.setGeoLocation(geoLocation);
                     picData.setDate(new Date());
 
-                    photoTake = true;
+                    photoTaken = true;
                 }catch (Exception e){
-                    toastMessage("Not enought memory",  Toast.LENGTH_SHORT);
+                    toastMessage("Not enough memory",  Toast.LENGTH_SHORT);
                 }
             }
         }else{
-            toastMessage("Error during take the photo",  Toast.LENGTH_SHORT);
+            toastMessage("Error during photo taking",  Toast.LENGTH_SHORT);
         }
     }
 }

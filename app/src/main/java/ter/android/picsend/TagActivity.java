@@ -2,8 +2,8 @@ package ter.android.picsend;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,8 +11,6 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
-import java.util.Date;
 
 import dataclass.EtatType;
 import dataclass.PictureData;
@@ -22,7 +20,7 @@ import mailSender.MailFeedTask;
 /**
  * Created by yhoupert on 17/01/15.
  */
-public class TagActivity extends Activity {
+public class TagActivity extends ActionBarActivity {
 
     private PictureData picData = new PictureData();
 
@@ -40,11 +38,11 @@ public class TagActivity extends Activity {
         picData = (PictureData) getIntent().getSerializableExtra("picData");
         Log.v("DEBUG",picData.toString());
 
-        initIdAfterPhoto();
+        initTag();
     }
 
 
-    private void initIdAfterPhoto() {
+    private void initTag() {
         rg_type = (RadioGroup) findViewById(R.id.type);
         rg_etat = (RadioGroup) findViewById(R.id.etat);
         rb_etat_1 = (RadioButton) findViewById(R.id.rb_etat_1);
@@ -70,7 +68,6 @@ public class TagActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -95,7 +92,6 @@ public class TagActivity extends Activity {
 
     }
 
-    /*Toast Message*/
     private void toastMessage(String msg) {
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
         toast.show();
@@ -105,7 +101,7 @@ public class TagActivity extends Activity {
         MailFeedTask mft = new MailFeedTask(this,picData);
         mft.execute();
 
-        toastMessage("Email en cours d'envoie");
+        toastMessage("Email being sent");
 
         Intent mainActivity = new Intent(this, MainActivity.class);
         startActivity(mainActivity);

@@ -1,7 +1,9 @@
 package dataclass;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by yhoupert on 08/01/15.
@@ -14,8 +16,7 @@ public class PictureData implements Serializable {
     private Date date;
     private GeoLocation geoLocation;
     private PointOfInterest pointOfInterest;
-    private Type type;
-    private EtatType etat;
+    private List<String> tags = new ArrayList<String>();
 
     public PictureData() {
     }
@@ -34,8 +35,7 @@ public class PictureData implements Serializable {
                 ", date=" + date +
                 ", geoLocation=" + geoLocation +
                 ", pointOfInterest=" + pointOfInterest +
-                ", type=" + type +
-                ", etat=" + etat +
+                ", type=" + tags.toString() +
                 '}';
     }
 
@@ -72,14 +72,6 @@ public class PictureData implements Serializable {
         this.geoLocation = geoLocation;
     }
 
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
     public String getFilePath() {
         return filePath;
     }
@@ -88,19 +80,19 @@ public class PictureData implements Serializable {
         this.filePath = filePath;
     }
 
-    public EtatType getEtat() {
-        return etat;
-    }
-
-    public void setEtat(EtatType etat) {
-        this.etat = etat;
-    }
-
     public PointOfInterest getPointOfInterest() {
         return pointOfInterest;
     }
 
     public void setPointOfInterest(PointOfInterest pointOfInterest) {
         this.pointOfInterest = pointOfInterest;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }

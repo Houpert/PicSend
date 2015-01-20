@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -58,12 +59,14 @@ public class TagActivity extends ActionBarActivity {
     private Spinner spinner4;
     private Spinner spinner5;
 
+    private EditText commentText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tag_layout);
+        commentText = (EditText) findViewById(R.id.tag_ed_comment);
         picData = (PictureData) getIntent().getSerializableExtra("picData");
         Log.v("DEBUG",picData.toString());
 
@@ -330,6 +333,7 @@ public class TagActivity extends ActionBarActivity {
         }
 
         picData.setTags(tags);
+        picData.setComment(commentText.getText().toString());
 
         sendEmail();
         Log.v("DEBUG", picData.toString());

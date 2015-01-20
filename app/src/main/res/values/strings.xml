@@ -25,6 +25,7 @@
 
     <!--AfterPhoto Layout String-->
     <string name="data">Data</string>
+    <string name="comment">Commentaire</string>
     <string name="animal">Animal</string>
     <string name="plante">Plante</string>
     <string name="more50">Hauteur + 50cm</string>

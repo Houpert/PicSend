@@ -13,6 +13,7 @@ public class PictureData implements Serializable {
     private String pseudo;
     private String email;
     private String filePath;
+    private String comment;
     private Date date;
     private GeoLocation geoLocation;
     private PointOfInterest pointOfInterest;
@@ -32,6 +33,7 @@ public class PictureData implements Serializable {
                 " pseudo='" + pseudo + '\'' +
                 ", email='" + email + '\'' +
                 ", filePath='" + filePath + '\'' +
+                ", comment='" + comment + '\'' +
                 ", date=" + date +
                 ", geoLocation=" + geoLocation +
                 ", pointOfInterest=" + pointOfInterest +
@@ -46,6 +48,15 @@ public class PictureData implements Serializable {
 
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
+    }
+
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public String getEmail() {

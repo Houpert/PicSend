@@ -76,6 +76,26 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/spinner04" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/comment"
+            android:id="@+id/comment"
+            android:layout_below="@+id/afterphoto_tv_data"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tag_ed_comment"
+            android:maxLength="150"
+            android:maxWidth="150dp"
+            android:layout_below="@+id/comment"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true" />
+
     </RelativeLayout>
 
 </RelativeLayout>

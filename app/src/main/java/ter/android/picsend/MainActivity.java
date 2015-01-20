@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,9 +30,11 @@ import java.util.Date;
 import dataclass.GeoLocation;
 import dataclass.PointOfInterest;
 import dataclass.PictureData;
+import mailSender.Mail;
 
 public class MainActivity extends ActionBarActivity {
 
+    private Mail m;
     private boolean photoTaken = false;
 
     /*Const*/
@@ -182,14 +186,9 @@ public class MainActivity extends ActionBarActivity {
 
 
                     Display display = getWindowManager().getDefaultDisplay();
-                    Point size = new Point();
-                    display.getSize(size);
-
-                    myBitmap.createScaledBitmap(myBitmap, size.x/25, size.y/25, true);
                     img.setImageBitmap(myBitmap);
 
                     toastMessage("Add a point of interest on the picture",  Toast.LENGTH_LONG);
-
                     this.img.setOnTouchListener(new View.OnTouchListener() {
 
                         @Override
@@ -204,10 +203,35 @@ public class MainActivity extends ActionBarActivity {
                             int imageX = touchX - viewCoords[0]; // viewCoords[0] is the X coordinate
                             int imageY = touchY - viewCoords[1]; // viewCoords[1] is the y coordinate
 
-                            PointOfInterest ip = new PointOfInterest(imageX,imageY);
                             interact.setX(touchX);
                             interact.setY(touchY);
                             interact.setVisibility(View.VISIBLE);
+
+
+                            Drawable drawable = img.getDrawable();
+                            Rect imageBounds = drawable.getBounds();
+
+                            //Taille de l'image de base
+                            int intrinsicHeight = drawable.getIntrinsicHeight();
+                            int intrinsicWidth = drawable.getIntrinsicWidth();
+
+                            //Taille de l'image resize
+                            int scaledHeight = img.getHeight();
+                            int scaledWidth = img.getWidth();
+
+                            //Ratio de l'image
+                            float heightRatio = intrinsicHeight / scaledHeight;
+                            float widthRatio = intrinsicWidth / scaledWidth;
+
+                            //distance ecran clique user
+                            float scaledImageOffsetX = touchX - imageBounds.left;
+                            float scaledImageOffsetY = touchY - imageBounds.top;
+
+                            //coord de l'image
+                            int originalImageOffsetX = (int)(Math.round(scaledImageOffsetX * widthRatio));
+                            int originalImageOffsetY = (int)(Math.round(scaledImageOffsetY * heightRatio));
+
+                            PointOfInterest ip = new PointOfInterest(originalImageOffsetX,originalImageOffsetY);
                             picData.setPointOfInterest(ip);
 
                             toastMessage("Point of interest added", Toast.LENGTH_SHORT);

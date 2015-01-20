@@ -126,13 +126,15 @@ public class TagActivity extends ActionBarActivity {
                     adapter.notifyDataSetChanged();
 
                     spinner2.setVisibility(View.VISIBLE);
-                    spinner3.setVisibility(View.INVISIBLE);
-                    spinner4.setVisibility(View.INVISIBLE);
-                    spinner5.setVisibility(View.INVISIBLE);
-                    currentNodeList3 = null;
-                    currentNodeList4 = null;
-                    currentNodeList5 = null;
+                } else {
+                    spinner2.setVisibility(View.INVISIBLE);
                 }
+                spinner3.setVisibility(View.INVISIBLE);
+                spinner4.setVisibility(View.INVISIBLE);
+                spinner5.setVisibility(View.INVISIBLE);
+                currentNodeList3 = null;
+                currentNodeList4 = null;
+                currentNodeList5 = null;
             }
 
             @Override
@@ -157,11 +159,13 @@ public class TagActivity extends ActionBarActivity {
                     adapter.notifyDataSetChanged();
 
                     spinner3.setVisibility(View.VISIBLE);
-                    spinner4.setVisibility(View.INVISIBLE);
-                    spinner5.setVisibility(View.INVISIBLE);
-                    currentNodeList4 = null;
-                    currentNodeList5 = null;
+                } else {
+                    spinner3.setVisibility(View.INVISIBLE);
                 }
+                spinner4.setVisibility(View.INVISIBLE);
+                spinner5.setVisibility(View.INVISIBLE);
+                currentNodeList4 = null;
+                currentNodeList5 = null;
             }
 
             @Override
@@ -186,9 +190,11 @@ public class TagActivity extends ActionBarActivity {
                     adapter.notifyDataSetChanged();
 
                     spinner4.setVisibility(View.VISIBLE);
-                    spinner5.setVisibility(View.INVISIBLE);
-                    currentNodeList5 = null;
+                } else {
+                    spinner4.setVisibility(View.INVISIBLE);
                 }
+                spinner5.setVisibility(View.INVISIBLE);
+                currentNodeList5 = null;
             }
 
             @Override
@@ -213,6 +219,8 @@ public class TagActivity extends ActionBarActivity {
                     adapter.notifyDataSetChanged();
 
                     spinner5.setVisibility(View.VISIBLE);
+                } else {
+                    spinner5.setVisibility(View.INVISIBLE);
                 }
             }
 

@@ -28,11 +28,9 @@ import java.util.Date;
 import dataclass.GeoLocation;
 import dataclass.PointOfInterest;
 import dataclass.PictureData;
-import mailSender.Mail;
 
 public class MainActivity extends ActionBarActivity {
 
-    private Mail m;
     private boolean photoTaken = false;
 
     /*Const*/
@@ -47,6 +45,7 @@ public class MainActivity extends ActionBarActivity {
     private LocationListener locationListener;
     private LocationManager locationManager;
     private ImageView img;
+    private ImageView interact;
     private Button button;
 
 
@@ -87,6 +86,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void initPhoto(){
         img = (ImageView) findViewById(R.id.imageView);
+        interact = (ImageView) findViewById(R.id.interact);
         button = (Button) findViewById(R.id.button_photo);
     }
 
@@ -205,8 +205,12 @@ public class MainActivity extends ActionBarActivity {
                             int imageY = touchY - viewCoords[1]; // viewCoords[1] is the y coordinate
 
                             PointOfInterest ip = new PointOfInterest(imageX,imageY);
+                            interact.setX(touchX);
+                            interact.setY(touchY);
+                            interact.setVisibility(View.VISIBLE);
                             picData.setPointOfInterest(ip);
-                            toastMessage("Point of interest added",  Toast.LENGTH_SHORT);
+
+                            toastMessage("Point of interest added", Toast.LENGTH_SHORT);
                             return false;
                         }
                     });
